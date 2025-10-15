@@ -1,21 +1,36 @@
 import streamlit as st
 import numpy as np
+import pandas as pd
 import pickle
+import warnings
 
 # ==========================================================
-# 📘 LOAD MODEL
+# ⚙️ CONFIGURATION
 # ==========================================================
-model = pickle.load(open("BC_ml_model.pkl", "rb"))
+warnings.filterwarnings("ignore", category=UserWarning)
+st.set_page_config(page_title="🩺 Breast Cancer Classifier", page_icon="💗", layout="wide")
 
 # ==========================================================
-# 🧠 PAGE SETUP
+# 🧠 LOAD MODEL
 # ==========================================================
-st.set_page_config(page_title="Breast Cancer Classifier", page_icon="🩺", layout="wide")
-st.title("🩺 Breast Cancer Classification App")
-st.write("This app predicts whether the tumor is **Malignant (M)** or **Benign (B)** based on medical measurements.")
+model = pickle.load(open("breast_cancer_model.pkl", "rb"))
 
 # ==========================================================
-# 📊 FEATURE INPUTS WITH DEFAULT VALUES
+# 🌸 PAGE TITLE & DESCRIPTION
+# ==========================================================
+st.title("💗 Breast Cancer Classification App")
+st.markdown(
+    """
+    ### 🔬 About this App
+    This AI-powered app predicts whether a breast tumor is **Malignant (Cancerous)** or **Benign (Non-Cancerous)**  
+    based on 30 key medical features from a fine needle aspiration test.
+    """
+)
+
+st.markdown("---")
+
+# ==========================================================
+# 🎯 DEFAULT VALUES (mean sample from dataset)
 # ==========================================================
 default_values = {
     'radius_mean': 17.99,
@@ -50,28 +65,69 @@ default_values = {
     'fractal_dimension_worst': 0.1189
 }
 
-st.sidebar.header("🔧 Input Features")
+# ==========================================================
+# 🧩 INPUT SECTION
+# ==========================================================
+st.sidebar.header("🧮 Input Features")
 
-inputs = []
-for feature, default in default_values.items():
-    val = st.sidebar.number_input(f"{feature}", value=float(default), step=0.01, format="%.5f")
-    inputs.append(val)
+st.sidebar.markdown("Enter or adjust values below:")
+
+inputs = {}
+
+with st.sidebar.expander("📊 Mean Features"):
+    for feature in list(default_values.keys())[:10]:
+        inputs[feature] = st.number_input(feature, value=float(default_values[feature]), step=0.01, format="%.5f")
+
+with st.sidebar.expander("📈 SE (Error) Features"):
+    for feature in list(default_values.keys())[10:20]:
+        inputs[feature] = st.number_input(feature, value=float(default_values[feature]), step=0.01, format="%.5f")
+
+with st.sidebar.expander("🔍 Worst Features"):
+    for feature in list(default_values.keys())[20:]:
+        inputs[feature] = st.number_input(feature, value=float(default_values[feature]), step=0.01, format="%.5f")
 
 # ==========================================================
-# 🎯 PREDICTION
+# 🧾 PREDICTION
 # ==========================================================
-if st.button("Predict"):
-    features = np.array(inputs).reshape(1, -1)
-    prediction = model.predict(features)[0]
-    result = "🧬 Malignant (Cancerous)" if prediction == "M" else "✅ Benign (Non-Cancerous)"
+if st.button("🔍 Predict Tumor Type"):
+    # Convert to DataFrame (fixes sklearn warning)
+    input_df = pd.DataFrame([inputs])
+    prediction = model.predict(input_df)[0]
 
-    st.subheader("Prediction Result:")
-    st.success(result)
+    # 🎨 Stylish Result
+    if prediction == "M":
+        st.markdown(
+            """
+            <div style="background-color:#ffcccc;padding:20px;border-radius:10px;text-align:center;">
+            <h2>🧬 Prediction: <span style="color:#b30000;">Malignant (Cancerous)</span></h2>
+            <p>⚠️ Immediate medical consultation is recommended.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    else:
+        st.markdown(
+            """
+            <div style="background-color:#d4edda;padding:20px;border-radius:10px;text-align:center;">
+            <h2>✅ Prediction: <span style="color:#155724;">Benign (Non-Cancerous)</span></h2>
+            <p>💚 No signs of malignancy detected.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
 else:
-    st.info("⬅️ Enter values on the left sidebar and click **Predict** to see the result.")
+    st.info("🧭 Adjust the input features in the sidebar and click **Predict Tumor Type** to see the result.")
 
 # ==========================================================
-# 🩻 FOOTER
+# 🌟 FOOTER
 # ==========================================================
 st.markdown("---")
-st.caption("Developed by Pranav | AI-Powered Breast Cancer Detection")
+st.markdown(
+    """
+    <div style="text-align:center;">
+        <p>Developed by <b>Pranav</b> 🧠 | Powered by <b>Machine Learning</b> 🤖</p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
