@@ -13,7 +13,7 @@ st.set_page_config(page_title="🩺 Breast Cancer Classifier", page_icon="💗",
 # ==========================================================
 # 🧠 LOAD MODEL
 # ==========================================================
-model = pickle.load(open("breast_cancer_model.pkl", "rb"))
+model = pickle.load(open("BC_ml_model.pkl","rb"))
 
 # ==========================================================
 # 🌸 PAGE TITLE & DESCRIPTION
