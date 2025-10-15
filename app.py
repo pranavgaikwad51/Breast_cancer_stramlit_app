@@ -50,10 +50,14 @@ st.markdown("""
         .result-card {
             padding: 25px;
             border-radius: 15px;
-            box-shadow: 0px 5px 25px rgba(0,0,0,0.1);
+            box-shadow: 0px 5px 25px rgba(0,0,0,0.15);
             text-align: center;
             background-color: white;
             margin-top: 30px;
+            transition: transform 0.3s;
+        }
+        .result-card:hover {
+            transform: scale(1.02);
         }
 
         /* Button styling */
@@ -73,8 +77,17 @@ st.markdown("""
 
         /* Sidebar styling */
         [data-testid="stSidebar"] {
-            background: linear-gradient(180deg, #ffe4ec 0%, #fff 100%);
+            background: linear-gradient(180deg, #f5a9bc 0%, #ffd1dc 100%);
             border-right: 2px solid #f8c8dc;
+            color: #333333;
+        }
+        .sidebar .stNumberInput input {
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(255, 105, 135, 0.2);
+            transition: 0.3s;
+        }
+        .sidebar .stNumberInput input:focus {
+            box-shadow: 0 0 12px rgba(255, 105, 135, 0.5);
         }
 
         /* Footer */
@@ -94,7 +107,7 @@ MODEL_PATH = "BC_ml_model.pkl"
 if os.path.exists(MODEL_PATH):
     model = pickle.load(open(MODEL_PATH, "rb"))
 else:
-    st.error("❌ Model file not found! Please ensure 'breast_cancer_model.pkl' is in the same folder as this app.")
+    st.error("❌ Model file not found! Please ensure 'BC_ml_model.pkl' is in the same folder as this app.")
     st.stop()
 
 # ==========================================================
